@@ -1,0 +1,126 @@
+---
+description: Project conventions for the Playwright + TypeScript Toolshop E2E suite
+alwaysApply: true
+---
+
+# Project rules
+
+Guidance for AI assistants working in this repository.
+Keep in sync with `CLAUDE.md` (same rules for Claude Code).
+
+## Project
+
+Playwright + TypeScript end-to-end tests for Practice Software Testing ("Toolshop"),
+a public demo e-commerce app built for test-automation practice: https://practicesoftwaretesting.com.
+This is a portfolio project: readable, stable tests matter more than their number.
+
+## Commands
+
+```bash
+npm test                                  # all tests in chromium, firefox and webkit
+npx playwright test --project=chromium    # one browser, for quick checks
+npx playwright test e2e/signIn.test.ts    # one file
+npx playwright test -g "administrator"    # tests whose title matches
+npx playwright show-report                # open the last HTML report
+npm run lint                              # ESLint
+npm run lint:fix                          # ESLint with autofix
+npx tsc --noEmit                          # type check
+```
+
+Before committing: lint, type check and tests must pass.
+
+## Structure
+
+```
+e2e/                  test specs (*.test.ts)
+pages/                Page Objects, one class per page (camelCase file, PascalCase class)
+fixtures/pages.ts     custom fixtures that give tests the Page Objects; exports test and expect
+playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects
+.github/workflows/    CI, manual trigger only (see CI)
+```
+
+## Page Objects
+
+Every Page Object has the same shape:
+
+```ts
+import type { Page } from '@playwright/test';
+
+export class LoginPage {
+  readonly page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  get locators() {
+    return {
+      emailInput: () => this.page.getByTestId('email'),
+      productCardByName: (name: string) => this.page.getByTestId('product-name').filter({ hasText: name }),
+    };
+  }
+
+  async userLogin(email: string, password: string) {
+    await this.locators.emailInput().fill(email);
+    // ...
+  }
+}
+```
+
+- Locators live in the `locators` getter as arrow functions, static and parameterized ones together.
+  No `readonly` Locator fields. Call them with parentheses: `loginPage.locators.emailInput()`.
+- Methods are user actions (`navigate`, `userLogin`, ...). They are `async` and `await` every Playwright call.
+- No `expect` inside Page Objects: pages describe what can be done, tests decide what to check.
+- A new Page Object must be registered in `fixtures/pages.ts` (the `Pages` type and a fixture).
+
+## Tests
+
+- Import `test` and `expect` from `../fixtures/pages`, never from `@playwright/test`,
+  otherwise the page fixtures are not available.
+- Take Page Objects from the test parameters: `async ({ loginPage, homePage }) => ...`. Don't `new` them in tests.
+- Shared setup steps go into `test.beforeEach` inside `test.describe`.
+- Every assertion has a message: `expect(locator, 'Login error should be shown')`.
+- Web-first assertions only (`toBeVisible`, `toHaveText`, `toHaveURL`, ...).
+  No `waitForTimeout`, no reading a value and then comparing it.
+- `locator.count()` and `locator.all()` don't wait. Assert that the first element is visible before using them.
+- Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.
+- Browser contexts are created and closed per test by Playwright. Close only contexts you create yourself
+  with `browser.newContext()`, in the teardown part of a fixture.
+
+## Locators
+
+- The app marks elements with `data-test`. The config sets `testIdAttribute: 'data-test'`,
+  so `getByTestId('email')` matches `data-test="email"`.
+- Preference order: `getByTestId`, then `getByRole`, then `locator(css)` only when nothing else exists.
+- Table rows: search inside `tbody`. `getByRole('row')` on the whole table also matches the header row.
+
+## Timeouts
+
+`actionTimeout` is 10 s (config), `expect` 5 s and the test 30 s (defaults).
+Don't add visibility assertions before actions just to fail faster; `actionTimeout` already covers that.
+
+## Test data on a shared public site
+
+- Demo accounts, password `welcome01`:
+  customer `customer2@practicesoftwaretesting.com` (Jack Howe), admin `admin@practicesoftwaretesting.com` (John Doe).
+- Never submit a wrong password for a real demo account: repeated failures lock it for everyone.
+  Negative login tests use a non-existent email, e.g. `not.registered@example.com`.
+- Orders and invoices are created by everyone who practises on the site.
+  Assert formats (`/^INV-\d+$/`), not specific values.
+
+## CI
+
+`.github/workflows/playwright.yml` runs manually only (`workflow_dispatch`): the public site shows
+a Cloudflare bot check to GitHub-hosted runners, so runs against it fail. Do not try to bypass it.
+Plan: run Toolshop in Docker inside CI, then re-enable push and pull request triggers.
+
+## Code style
+
+ESLint flat config with `@stylistic`: 2-space indent, single quotes, semicolons.
+Type-aware rules `no-floating-promises` and `await-thenable` catch a missing `await`.
+
+## Working in this repo
+
+The owner writes the tests and uses AI assistants for review and explanations.
+Unfinished tests in the working tree are work in progress: keep them, don't rewrite or delete them unless asked.
+Re-read a file right before editing it; it may have changed since you last saw it.
