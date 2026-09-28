@@ -8,6 +8,7 @@ Keep in sync with `.cursor/rules/project.mdc` (same rules for Cursor).
 Playwright + TypeScript end-to-end tests for Practice Software Testing ("Toolshop"),
 a public demo e-commerce app built for test-automation practice: https://practicesoftwaretesting.com.
 This is a portfolio project: readable, stable tests matter more than their number.
+What to cover next and in which order: `docs/TEST_STRATEGY.md`. Check off items there when they are covered.
 
 ## Commands
 
