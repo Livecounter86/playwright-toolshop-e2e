@@ -25,9 +25,9 @@ and the admin area (brands, categories, products, orders, users, messages, repor
 ## Coverage plan
 
 ### Phase 0. Cleanup
-- [ ] Invoice table rows are located inside `tbody` only (the header row must not count as data)
-- [ ] Assertion messages match what is actually asserted
-- [ ] `UserAdminPage` renamed to `AccountPage` to avoid confusion with the admin area
+- [x] Invoice table rows are located inside `tbody` only (the header row must not count as data)
+- [x] Assertion messages match what is actually asserted
+- [x] `UserAdminPage` renamed to `AccountPage` to avoid confusion with the admin area
 
 ### Phase 1. Authentication and access control
 Critical, easy.

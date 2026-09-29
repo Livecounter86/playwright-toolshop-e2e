@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export class UserAdminPage {
+export class AccountPage {
   readonly page: Page;
 
   constructor(page: Page) {
@@ -9,8 +9,8 @@ export class UserAdminPage {
 
   get locators() {
     return {
-      userAdminNavButton: () => this.page.getByTestId('nav-menu'),
-      userAdminPageTitle: () => this.page.getByTestId('page-title'),
+      userMenu: () => this.page.getByTestId('nav-menu'),
+      pageTitle: () => this.page.getByTestId('page-title'),
       buttonFavorites: () => this.page.getByTestId('nav-favorites'),
       buttonProfile: () => this.page.getByTestId('nav-profile'),
       buttonInvoices: () => this.page.getByTestId('nav-invoices'),
