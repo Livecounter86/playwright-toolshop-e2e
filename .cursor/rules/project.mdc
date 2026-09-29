@@ -35,6 +35,8 @@ Before committing: lint, type check and tests must pass.
 ```
 e2e/                  test specs (*.test.ts)
 pages/                Page Objects, one class per page (camelCase file, PascalCase class)
+pages/basePage.ts     base class of every page: holds `page` and the shared `header`
+components/           parts shown on many pages (header), same shape as Page Objects
 fixtures/pages.ts     custom fixtures that give tests the Page Objects; exports test and expect
 playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects
 .github/workflows/    CI, manual trigger only (see CI)
@@ -42,18 +44,12 @@ playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects
 
 ## Page Objects
 
-Every Page Object has the same shape:
+Every Page Object extends `BasePage` and has the same shape:
 
 ```ts
-import type { Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class LoginPage {
-  readonly page: Page;
-
-  constructor(page: Page) {
-    this.page = page;
-  }
-
+export class LoginPage extends BasePage {
   get locators() {
     return {
       emailInput: () => this.page.getByTestId('email'),
@@ -68,17 +64,32 @@ export class LoginPage {
 }
 ```
 
+- Pages don't declare `page` or a constructor: both come from `BasePage`, which also creates `this.header`.
 - Locators live in the `locators` getter as arrow functions, static and parameterized ones together.
   No `readonly` Locator fields. Call them with parentheses: `loginPage.locators.emailInput()`.
+- Locator names: buttons and links start with `button` (`buttonSignIn`, `buttonFavorites`),
+  inputs end with `Input` (`emailInput`).
 - Methods are user actions (`navigate`, `userLogin`, ...). They are `async` and `await` every Playwright call.
+  Add a method once an action is needed in a second place; until then keep the steps in the test.
 - No `expect` inside Page Objects: pages describe what can be done, tests decide what to check.
 - A new Page Object must be registered in `fixtures/pages.ts` (the `Pages` type and a fixture).
+
+## Components
+
+- Something shown on many pages is a component in `components/`, not a locator copied into every page.
+- `HeaderComponent` (`components/headerComponent.ts`) holds the navigation bar: sign in, user menu,
+  sign out, main links. `BasePage` creates it, so every page has it: `accountPage.header.locators.userMenu()`.
+- Components have the same shape as pages (`page`, constructor, `get locators()`, actions),
+  but don't extend `BasePage` and aren't fixtures.
+- Only elements that really belong to a page stay in its Page Object. For example, the account page
+  tiles (`nav-favorites`, ...) are page content, while the user menu items (`nav-my-favorites`, ...) are header.
 
 ## Tests
 
 - Import `test` and `expect` from `../fixtures/pages`, never from `@playwright/test`,
   otherwise the page fixtures are not available.
 - Take Page Objects from the test parameters: `async ({ loginPage, homePage }) => ...`. Don't `new` them in tests.
+- Reach the header through the page the user is on: `homePage.header.locators.buttonSignIn()`.
 - Shared setup steps go into `test.beforeEach` inside `test.describe`.
 - Every assertion has a message: `expect(locator, 'Login error should be shown')`.
 - Web-first assertions only (`toBeVisible`, `toHaveText`, `toHaveURL`, ...).

@@ -1,12 +1,6 @@
-import { type Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class LoginPage {
-  readonly page: Page;
-
-  constructor(page: Page) {
-    this.page = page;
-  }
-
+export class LoginPage extends BasePage {
   get locators() {
     return {
       emailInput: () => this.page.getByTestId('email'),
