@@ -1,18 +1,6 @@
-import type { Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class HomePage {
-  readonly page: Page;
-
-  constructor(page: Page) {
-    this.page = page;
-  }
-
-  get locators() {
-    return {
-      signInButton: () => this.page.getByTestId('nav-sign-in'),
-    };
-  }
-
+export class HomePage extends BasePage {
   async navigate() {
     await this.page.goto('/');
   }

@@ -1,15 +1,8 @@
-import type { Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class AccountPage {
-  readonly page: Page;
-
-  constructor(page: Page) {
-    this.page = page;
-  }
-
+export class AccountPage extends BasePage {
   get locators() {
     return {
-      userMenu: () => this.page.getByTestId('nav-menu'),
       pageTitle: () => this.page.getByTestId('page-title'),
       buttonFavorites: () => this.page.getByTestId('nav-favorites'),
       buttonProfile: () => this.page.getByTestId('nav-profile'),
