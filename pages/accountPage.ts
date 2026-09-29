@@ -15,6 +15,11 @@ export class AccountPage {
       buttonProfile: () => this.page.getByTestId('nav-profile'),
       buttonInvoices: () => this.page.getByTestId('nav-invoices'),
       buttonMessages: () => this.page.getByTestId('nav-messages'),
+      buttonSignOut: () => this.page.getByTestId('nav-sign-out'),
     };
   }
-};
+
+  async navigate() {
+    await this.page.goto('/account');
+  }
+}
