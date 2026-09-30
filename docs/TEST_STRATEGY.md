@@ -35,8 +35,8 @@ Critical, easy.
 - [x] (+) Admin signs in, lands on `/admin/dashboard`, invoice table is filled
 - [x] (−) Unregistered email shows "Invalid email or password"
 - [x] (+) Logout returns the user to the guest state
-- [ ] (−) Empty email and password show field validation errors
-- [ ] (−) Malformed email shows a validation error
+- [x] (−) Empty email and password show field validation errors
+- [x] (−) Malformed email shows a validation error
 - [ ] (+) Customer sees the account menu: Favorites, Profile, Invoices, Messages
 - [ ] (−) Guest opening `/account` is redirected to sign in
 - [ ] (−) Customer opening `/admin/dashboard` is denied (role boundary)
