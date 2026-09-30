@@ -18,6 +18,11 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+        CUSTOMER_EMAIL: ${{ vars.CUSTOMER_EMAIL }}
+        CUSTOMER_PASSWORD: ${{ secrets.CUSTOMER_PASSWORD }}
+        ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
+        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
     - uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:

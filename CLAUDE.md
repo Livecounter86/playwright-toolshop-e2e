@@ -13,6 +13,7 @@ What to cover next and in which order: `docs/TEST_STRATEGY.md`. Check off items 
 ## Commands
 
 ```bash
+cp .env.example .env                      # once after cloning, then fill in the values (see Test data)
 npm test                                  # all tests in chromium, firefox and webkit
 npx playwright test --project=chromium    # one browser, for quick checks
 npx playwright test e2e/signIn.test.ts    # one file
@@ -33,8 +34,10 @@ pages/                Page Objects, one class per page (camelCase file, PascalCa
 pages/basePage.ts     base class of every page: holds `page` and the shared `header`
 components/           parts shown on many pages (header), same shape as Page Objects
 helpers/              plain functions that are neither pages nor fixtures (API login)
+helpers/users.ts      test accounts read from environment variables
 fixtures/pages.ts     custom fixtures that give tests the Page Objects; exports test and expect
-playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects
+playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects; loads .env
+.env.example          names of the required environment variables, without values
 .github/workflows/    CI, manual trigger only (see CI)
 ```
 
@@ -98,7 +101,7 @@ export class LoginPage extends BasePage {
 ## Signed-in tests
 
 - The sign-in form is tested by `e2e/signIn.test.ts`. Other tests that need a signed-in user log in via the API:
-  `loginViaApi(page, request, email, password)` from `helpers/auth.ts`. It opens `/` and puts the token
+  `loginViaApi(page, request, users.customer.email, users.customer.password)` from `helpers/auth.ts`. It opens `/` and puts the token
   into `localStorage['auth-token']` once; the test then navigates wherever it needs.
 - Put the token once. Never re-inject it on every navigation (no `addInitScript` for auth):
   the app must keep the session itself, and a test must fail if it loses it.
@@ -122,8 +125,11 @@ Don't add visibility assertions before actions just to fail faster; `actionTimeo
 
 ## Test data on a shared public site
 
-- Demo accounts, password `welcome01`:
-  customer `customer2@practicesoftwaretesting.com` (Jack Howe), admin `admin@practicesoftwaretesting.com` (John Doe).
+- Tests use two demo accounts: customer (Jack Howe) and admin (John Doe).
+  Take their credentials from `users` in `helpers/users.ts`; never write emails or passwords of real accounts in code.
+- `users` reads `CUSTOMER_EMAIL`, `CUSTOMER_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` from the environment
+  and throws `Missing env variable ...` if one is empty. Locally they come from `.env` (git-ignored),
+  in CI from GitHub (see CI). The demo credentials are listed in the Toolshop README.
 - Never submit a wrong password for a real demo account: repeated failures lock it for everyone.
   Negative login tests use a non-existent email, e.g. `not.registered@example.com`.
 - Orders and invoices are created by everyone who practises on the site.
@@ -134,6 +140,10 @@ Don't add visibility assertions before actions just to fail faster; `actionTimeo
 `.github/workflows/playwright.yml` runs manually only (`workflow_dispatch`): the public site shows
 a Cloudflare bot check to GitHub-hosted runners, so runs against it fail. Do not try to bypass it.
 Plan: run Toolshop in Docker inside CI, then re-enable push and pull request triggers.
+
+Credentials reach the tests through the `env:` block of the test step: passwords are repository Secrets
+(`secrets.CUSTOMER_PASSWORD`, `secrets.ADMIN_PASSWORD`), emails are repository Variables (`vars.CUSTOMER_EMAIL`,
+`vars.ADMIN_EMAIL`). A new variable must be added to `.env.example`, `helpers/users.ts`, GitHub settings and `env:`.
 
 ## Code style
 

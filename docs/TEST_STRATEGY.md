@@ -92,6 +92,7 @@ Most critical, harder.
 - [ ] (+) The new invoice appears in Account → Invoices and in `GET /invoices`
 
 ### Milestone A. Docker in CI
+- [x] Test account credentials come from environment variables: `.env` locally, GitHub Secrets and Variables in CI
 - [ ] `baseURL` and `apiURL` come from environment variables, defaulting to the public site
 - [ ] CI starts Toolshop with `docker compose -f docker-compose.prod.yml up`, waits for `/status`, runs against it
 - [ ] Push and pull request triggers re-enabled; CI status badge in the README
