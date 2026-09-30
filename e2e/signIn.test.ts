@@ -36,4 +36,18 @@ test.describe('Sign In Tests', () => {
     await loginPage.userLogin('not.registered@example.com', 'welcome01');
     await expect(loginPage.locators.loginErrorMessage(), 'Login error should be shown').toHaveText('Invalid email or password');
   });
+
+  test('sign in with empty fields shows validation errors', async ({ loginPage }) => {
+    await expect(loginPage.locators.emailInput(), 'Email input should be empty').toBeEmpty();
+    await expect(loginPage.locators.passwordInput(), 'Password input should be empty').toBeEmpty();
+    await loginPage.locators.loginSubmitButton().click();
+    await expect(loginPage.locators.emailFieldError(), 'Email empty field error should be shown').toHaveText('Email is required');
+    await expect(loginPage.locators.passwordFieldError(), 'Password empty field error should be shown').toHaveText('Password is required');
+  });
+
+  test('sign in with invalid email format shows validation error', async ({ loginPage }) => {
+    await loginPage.userLogin('test@', 'welcome01');
+    await expect(loginPage.locators.emailFieldError(), 'Email invalid format error should be shown').toHaveText('Email format is invalid');
+    await expect(loginPage.locators.passwordFieldError(), 'Password field should not show error').not.toBeVisible();
+  });
 });

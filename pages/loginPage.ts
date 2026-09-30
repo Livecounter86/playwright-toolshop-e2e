@@ -7,6 +7,8 @@ export class LoginPage extends BasePage {
       passwordInput: () => this.page.getByTestId('password'),
       loginSubmitButton: () => this.page.getByTestId('login-submit'),
       loginErrorMessage: () => this.page.getByTestId('login-error'),
+      emailFieldError: () => this.page.getByTestId('email-error'),
+      passwordFieldError: () => this.page.getByTestId('password-error'),
     };
   }
 
