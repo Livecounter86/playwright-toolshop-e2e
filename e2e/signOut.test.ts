@@ -6,10 +6,11 @@ test.describe('Sign Out Tests', () => {
     await loginViaApi(page, request, 'customer2@practicesoftwaretesting.com', 'welcome01');
     await accountPage.navigate();
 
-    await expect(accountPage.locators.userMenu(), 'Logged in user name should be shown in header').toHaveText('Jack Howe');
-    await accountPage.locators.userMenu().click();
-    await accountPage.locators.buttonSignOut().click();
+    await expect(accountPage.header.locators.userMenu(), 'Logged in user name should be shown in header').toHaveText('Jack Howe');
+    await accountPage.header.locators.userMenu().click();
+    await accountPage.header.locators.buttonSignOut().click();
     await expect(loginPage.page, 'User should be redirected to login page').toHaveURL(/\/login$/);
-    await expect(accountPage.locators.userMenu(), 'Logged in user name should not be shown in header').not.toBeVisible();
+    await expect(accountPage.header.locators.userMenu(), 'Logged in user name should not be shown in header').not.toBeVisible();
+    await expect(loginPage.header.locators.buttonSignIn(), 'Sign In button should be shown in header').toBeVisible();
   });
 });

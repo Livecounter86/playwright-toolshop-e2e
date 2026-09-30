@@ -34,13 +34,14 @@ Critical, easy.
 - [x] (+) Customer signs in, lands on `/account`, name shown in header
 - [x] (+) Admin signs in, lands on `/admin/dashboard`, invoice table is filled
 - [x] (−) Unregistered email shows "Invalid email or password"
-- [ ] (+) Logout returns the user to the guest state
+- [x] (+) Logout returns the user to the guest state
 - [ ] (−) Empty email and password show field validation errors
 - [ ] (−) Malformed email shows a validation error
 - [ ] (+) Customer sees the account menu: Favorites, Profile, Invoices, Messages
 - [ ] (−) Guest opening `/account` is redirected to sign in
 - [ ] (−) Customer opening `/admin/dashboard` is denied (role boundary)
-- [ ] Infrastructure: setup project with `storageState` for customer and admin
+- [ ] Infrastructure: `storageState` fixture that gives each signed-in test a fresh API token
+  (tokens live 5 minutes, so one token saved for the whole run would expire mid-run)
 
 ### Phase 2. Catalog and search
 Critical, easy, read-only, no login.

@@ -9,7 +9,8 @@ export async function loginViaApi(page: Page, request: APIRequestContext, email:
   }
 
   const { access_token } = await response.json();
-  await page.addInitScript((token) => {
+  await page.goto('/');
+  await page.evaluate((token) => {
     localStorage.setItem('auth-token', token);
   }, access_token);
 }

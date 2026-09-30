@@ -8,7 +8,6 @@ export class AccountPage extends BasePage {
       buttonProfile: () => this.page.getByTestId('nav-profile'),
       buttonInvoices: () => this.page.getByTestId('nav-invoices'),
       buttonMessages: () => this.page.getByTestId('nav-messages'),
-      buttonSignOut: () => this.page.getByTestId('nav-sign-out'),
     };
   }
 
