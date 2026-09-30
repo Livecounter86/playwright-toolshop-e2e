@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/pages';
+import { users } from '../helpers/users';
 
 test.describe('Sign In Tests', () => {
   test.beforeEach(async ({ homePage }) => {
@@ -7,7 +8,7 @@ test.describe('Sign In Tests', () => {
   });
 
   test('sign in with valid credentials', async ({ loginPage, accountPage }) => {
-    await loginPage.userLogin('customer2@practicesoftwaretesting.com', 'welcome01');
+    await loginPage.userLogin(users.customer.email, users.customer.password);
     await expect(accountPage.page, 'User should be redirected to account page').toHaveURL(/\/account$/);
     await expect(accountPage.locators.pageTitle(), 'Account page title should be shown').toHaveText('My account');
     await expect(accountPage.header.locators.userMenu(), 'Logged in user name should be shown in header').toHaveText('Jack Howe');
@@ -16,7 +17,7 @@ test.describe('Sign In Tests', () => {
   test('sign in as administrator', async ({ loginPage, adminDashboardPage }) => {
     const rows = adminDashboardPage.locators.tableRows();
 
-    await loginPage.userLogin('admin@practicesoftwaretesting.com', 'welcome01');
+    await loginPage.userLogin(users.admin.email, users.admin.password);
     await expect(adminDashboardPage.page, 'User should be redirected to admin dashboard page').toHaveURL('/admin/dashboard');
     await expect(adminDashboardPage.locators.pageTitle(), 'Admin page title should be shown').toHaveText('Sales over the years');
     await expect(adminDashboardPage.header.locators.userMenu(), 'Logged in user name should be shown in header').toHaveText('John Doe');
@@ -33,7 +34,7 @@ test.describe('Sign In Tests', () => {
 
   // Non-existent email: repeated failed logins on a real demo account would lock it
   test('sign in with unregistered email', async ({ loginPage }) => {
-    await loginPage.userLogin('not.registered@example.com', 'welcome01');
+    await loginPage.userLogin('not.registered@example.com', 'password1');
     await expect(loginPage.locators.loginErrorMessage(), 'Login error should be shown').toHaveText('Invalid email or password');
   });
 
@@ -46,7 +47,7 @@ test.describe('Sign In Tests', () => {
   });
 
   test('sign in with invalid email format shows validation error', async ({ loginPage }) => {
-    await loginPage.userLogin('test@', 'welcome01');
+    await loginPage.userLogin('test@', 'password1');
     await expect(loginPage.locators.emailFieldError(), 'Email invalid format error should be shown').toHaveText('Email format is invalid');
     await expect(loginPage.locators.passwordFieldError(), 'Password field should not show error').not.toBeVisible();
   });
