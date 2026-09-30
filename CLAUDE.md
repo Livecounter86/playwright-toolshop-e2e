@@ -32,6 +32,7 @@ e2e/                  test specs (*.test.ts)
 pages/                Page Objects, one class per page (camelCase file, PascalCase class)
 pages/basePage.ts     base class of every page: holds `page` and the shared `header`
 components/           parts shown on many pages (header), same shape as Page Objects
+helpers/              plain functions that are neither pages nor fixtures (API login)
 fixtures/pages.ts     custom fixtures that give tests the Page Objects; exports test and expect
 playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects
 .github/workflows/    CI, manual trigger only (see CI)
@@ -93,6 +94,19 @@ export class LoginPage extends BasePage {
 - Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.
 - Browser contexts are created and closed per test by Playwright. Close only contexts you create yourself
   with `browser.newContext()`, in the teardown part of a fixture.
+
+## Signed-in tests
+
+- The sign-in form is tested by `e2e/signIn.test.ts`. Other tests that need a signed-in user log in via the API:
+  `loginViaApi(page, request, email, password)` from `helpers/auth.ts`. It opens `/` and puts the token
+  into `localStorage['auth-token']` once; the test then navigates wherever it needs.
+- Put the token once. Never re-inject it on every navigation (no `addInitScript` for auth):
+  the app must keep the session itself, and a test must fail if it loses it.
+- API tokens live 5 minutes (`expires_in: 300`). Each test gets its own fresh token;
+  never save one token for the whole run.
+- Sign-out tests use their own token and never share it with other tests.
+- Planned: once many tests need a signed-in user, switch to a `storageState` fixture (`test.use({ authUser })`)
+  built on the same API login, which also removes the extra `goto('/')`.
 
 ## Locators
 

@@ -10,4 +10,8 @@ export class AccountPage extends BasePage {
       buttonMessages: () => this.page.getByTestId('nav-messages'),
     };
   }
-};
+
+  async navigate() {
+    await this.page.goto('/account');
+  }
+}
