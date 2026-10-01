@@ -102,6 +102,11 @@ export class LoginPage extends BasePage {
 - Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.
 - Browser contexts are created and closed per test by Playwright. Close only contexts you create yourself
   with `browser.newContext()`, in the teardown part of a fixture.
+- Navigate by clicks, as a user does: through the header, the user menu, account tiles, product cards, links.
+  Tests of account pages (favorites, profile, invoices, messages) always reach the page this way,
+  so navigation is covered by real page tests. Use `goto` only for the entry point (`/`) and in setup.
+  If a `goto` shortcut looks tempting (the click path is long or flaky), don't apply it:
+  suggest it to the owner, and only after the test is written.
 
 ## Signed-in tests
 
