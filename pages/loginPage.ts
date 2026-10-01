@@ -3,6 +3,7 @@ import { BasePage } from './basePage';
 export class LoginPage extends BasePage {
   get locators() {
     return {
+      loginForm: () => this.page.getByTestId('login-form'),
       emailInput: () => this.page.getByTestId('email'),
       passwordInput: () => this.page.getByTestId('password'),
       loginSubmitButton: () => this.page.getByTestId('login-submit'),
