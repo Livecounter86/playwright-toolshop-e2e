@@ -92,9 +92,9 @@ Most critical, harder.
 
 ### Milestone A. Docker in CI
 - [x] Test account credentials come from environment variables: `.env` locally, GitHub Secrets and Variables in CI
-- [ ] `baseURL` and `apiURL` come from environment variables, defaulting to the public site
-- [ ] CI starts Toolshop with `docker compose -f docker-compose.prod.yml up`, waits for `/status`, runs against it
-- [ ] Push and pull request triggers re-enabled; CI status badge in the README
+- [x] `BASE_URL` and `API_URL` come from environment variables, defaulting to the public site
+- [x] CI starts Toolshop with `docker compose up` (`docker-compose.yml`), seeds it, waits for the API and the UI, runs against it
+- [x] Push and pull request triggers re-enabled; CI status badge in the README
 
 ### Milestone B. Bug hunt on the `with-bugs` version
 - [ ] Run the suite against `with-bugs.practicesoftwaretesting.com` and document the bugs it catches in the README

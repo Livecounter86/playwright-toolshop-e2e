@@ -1,6 +1,6 @@
 import type { APIRequestContext, Page } from '@playwright/test';
 
-const API_URL = 'https://api.practicesoftwaretesting.com';
+const API_URL = process.env.API_URL || 'https://api.practicesoftwaretesting.com';
 
 export async function loginViaApi(page: Page, request: APIRequestContext, email: string, password: string) {
   const response = await request.post(`${API_URL}/users/login`, { data: { email, password } });

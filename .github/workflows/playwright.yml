@@ -1,7 +1,9 @@
 name: Playwright Tests
-# Manual runs only: practicesoftwaretesting.com shows a Cloudflare bot check
-# to GitHub-hosted runners, so tests can't pass here against the public site
+# Runs against Toolshop started in Docker on the runner (docker-compose.yml).
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 jobs:
   test:
@@ -9,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
+    - name: Start Toolshop
+      run: docker compose up -d
     - uses: actions/setup-node@v7
       with:
         node-version: lts/*
@@ -16,13 +20,29 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Seed the database
+      run: |
+        for i in $(seq 1 20); do
+          docker compose exec -T mariadb mysqladmin ping -h localhost -u root -proot --silent && break
+          sleep 2
+        done
+        docker compose exec -T laravel-api php artisan migrate:fresh --seed
+    - name: Wait for the API and the UI
+      run: |
+        curl --fail --silent --retry 30 --retry-delay 2 --retry-all-errors http://localhost:8091/status
+        timeout 300 bash -c 'until curl --fail --silent --output /dev/null http://localhost:4200; do sleep 5; done'
     - name: Run Playwright tests
       run: npx playwright test
       env:
+        BASE_URL: http://localhost:4200
+        API_URL: http://localhost:8091
         CUSTOMER_EMAIL: ${{ vars.CUSTOMER_EMAIL }}
         CUSTOMER_PASSWORD: ${{ secrets.CUSTOMER_PASSWORD }}
         ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
         ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    - name: Toolshop logs
+      if: ${{ failure() }}
+      run: docker compose logs --tail=200    
     - uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:
