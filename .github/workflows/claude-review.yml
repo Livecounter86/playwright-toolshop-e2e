@@ -2,7 +2,10 @@ name: Claude Review
 # Reviews a new pull request against the rules in CLAUDE.md. Only comments, commits nothing.
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, ready_for_review, synchronize]
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   review:
     if: github.event.pull_request.draft == false
@@ -25,6 +28,7 @@ jobs:
 
           Review this pull request. First read CLAUDE.md and docs/TEST_STRATEGY.md, then the diff (gh pr diff).
           Check only the changed code.
+          This PR may already have review comments from earlier runs. Do not repeat a finding that was already commented, answered or fixed.
 
           1. Rules from CLAUDE.md: locators live in `get locators()`; locator names (`button...`, `...Input`);
              no `expect` in Page Objects; tests import `test` and `expect` from `../fixtures/pages`;
