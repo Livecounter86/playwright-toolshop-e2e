@@ -1,5 +1,7 @@
 # Playwright Toolshop E2E
 
+[![Playwright Tests](https://github.com/Livecounter86/playwright-toolshop-e2e/actions/workflows/playwright.yml/badge.svg)](https://github.com/Livecounter86/playwright-toolshop-e2e/actions/workflows/playwright.yml)
+
 End-to-end tests in Playwright and TypeScript for [Practice Software Testing](https://practicesoftwaretesting.com) ("Toolshop"),
 a public demo e-commerce app built for test-automation practice.
 
@@ -12,6 +14,7 @@ The coverage plan and progress are in [docs/TEST_STRATEGY.md](docs/TEST_STRATEGY
 - [Playwright Test](https://playwright.dev) with TypeScript, in Chromium, Firefox and WebKit
 - ESLint with type-aware rules and `@stylistic` formatting
 - dotenv for local configuration
+- Docker Compose to run Toolshop locally and in CI
 - GitHub Actions for CI
 
 ## Approach
@@ -37,6 +40,7 @@ components/           parts shown on many pages (header)
 fixtures/pages.ts     custom fixtures that provide the Page Objects
 helpers/              API sign-in and test accounts from environment variables
 docs/                 test strategy
+docker-compose.yml    Toolshop in Docker, with docker/nginx.conf
 playwright.config.ts  base URL, test id attribute, timeouts, browsers
 ```
 
@@ -67,8 +71,23 @@ npm run lint                              # ESLint
 npx tsc --noEmit                          # type check
 ```
 
+By default the tests run against the public site.
+
+## Running against a local Toolshop
+
+Toolshop can run on your machine in Docker. Requirements: Docker with Compose.
+
+```bash
+docker compose up -d                                                  # UI on :4200, API on :8091
+docker compose exec -T laravel-api php artisan migrate:fresh --seed   # create and fill the database
+BASE_URL=http://localhost:4200 API_URL=http://localhost:8091 npx playwright test
+docker compose down                                                   # stop when done
+```
+
+The UI compiles for a few minutes after the first start. The seed command also resets the data at any time.
+
 ## CI
 
-The GitHub Actions workflow runs on manual trigger only: the public site shows a Cloudflare bot check
-to GitHub-hosted runners. The next step is to start Toolshop in Docker inside CI, run the suite against it
-and turn on push and pull request triggers.
+GitHub Actions runs the suite on every pull request and on push to `main`:
+it starts Toolshop with Docker Compose on the runner, seeds the database, waits for the API and the UI,
+runs the tests in all three browsers and uploads the HTML report.
