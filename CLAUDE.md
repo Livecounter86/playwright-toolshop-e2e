@@ -160,3 +160,8 @@ Type-aware rules `no-floating-promises` and `await-thenable` catch a missing `aw
 The owner writes the tests and uses AI assistants for review and explanations.
 Unfinished tests in the working tree are work in progress: keep them, don't rewrite or delete them unless asked.
 Re-read a file right before editing it; it may have changed since you last saw it.
+
+When a diff adds or changes a test (including when you only review it), check the matching item in
+`docs/TEST_STRATEGY.md` (`- [ ]` to `- [x]`) in the same change. Match by what the test asserts, not by file name.
+If the test covers an item only partly, leave it unchecked and tell the owner.
+If no item matches, ask the owner whether to add one.

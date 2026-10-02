@@ -37,7 +37,7 @@ Critical, easy.
 - [x] (+) Logout returns the user to the guest state
 - [x] (−) Empty email and password show field validation errors
 - [x] (−) Malformed email shows a validation error
-- [ ] (−) Guest opening `/account` is redirected to sign in
+- [x] (−) Guest opening `/account` is redirected to sign in
 - [ ] (−) Customer opening `/admin/dashboard` is denied (role boundary)
 - [ ] Infrastructure: `storageState` fixture that gives each signed-in test a fresh API token
   (tokens live 5 minutes, so one token saved for the whole run would expire mid-run)
