@@ -1,0 +1,42 @@
+name: Claude Review
+# Reviews a new pull request against the rules in CLAUDE.md. Only comments, commits nothing.
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 1
+    - uses: anthropics/claude-code-action@v1
+      with:
+        claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        prompt: |
+          REPO: ${{ github.repository }}
+          PR NUMBER: ${{ github.event.pull_request.number }}
+
+          Review this pull request. First read CLAUDE.md and docs/TEST_STRATEGY.md, then the diff (gh pr diff).
+          Check only the changed code.
+
+          1. Rules from CLAUDE.md: locators live in `get locators()`; locator names (`button...`, `...Input`);
+             no `expect` in Page Objects; tests import `test` and `expect` from `../fixtures/pages`;
+             every `expect` has a message; web-first assertions only, no `waitForTimeout`;
+             `count()` and `all()` only after waiting for the first element; navigation by clicks, `goto` only for `/`;
+             no credentials in code; a new Page Object is registered in `fixtures/pages.ts`.
+          2. Does the test check what its title and its item in docs/TEST_STRATEGY.md claim?
+             Is that item checked off (`- [x]`) in this PR?
+          3. Stability: dependence on data that other people change, reading product cards before the grid is updated.
+
+          Output: only concrete findings, each as an inline comment on the exact line. No PR summary, no praise.
+          If there are no findings, post one short comment saying so. Do not modify any files.
+        claude_args: |
+          --max-turns 15
+          --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
