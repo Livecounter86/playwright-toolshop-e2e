@@ -2,11 +2,13 @@ import { BasePage } from './basePage';
 
 export class HomePage extends BasePage {
   get locators() {
+    const productCards = () => this.page.getByRole('link').filter({ has: this.page.getByTestId('product-price') });
+
     return {
-      productCards: () => this.page.getByRole('link').filter({ has: this.page.getByTestId('product-price') }),
-      productName: () => this.page.getByTestId('product-name'),
-      productPrice: () => this.page.getByTestId('product-price'),
-      productCardByName: (name: string) => this.page.getByRole('link').filter({
+      productCards,
+      productName: () => productCards().getByTestId('product-name'),
+      productPrice: () => productCards().getByTestId('product-price'),
+      productCardByName: (name: string) => productCards().filter({
         has: this.page.getByTestId('product-name').getByText(name, { exact: true }),
       }),
     };
