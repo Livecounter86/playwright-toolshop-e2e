@@ -37,7 +37,15 @@ jobs:
              no credentials in code; a new Page Object is registered in `fixtures/pages.ts`.
           2. Does the test check what its title and its item in docs/TEST_STRATEGY.md claim?
              Is that item checked off (`- [x]`) in this PR?
-          3. Stability: dependence on data that other people change, reading product cards before the grid is updated.
+          3. Stability: dependence on data that other people change, reading elements before the page has updated.
+
+          Before posting, check every finding. Post it only if all of these are true:
+          - It names a rule in CLAUDE.md that the changed line breaks, or a real defect you can show from the code.
+          - It is verified, not assumed. Don't state how the app, the API or a library behaves unless the code in this
+            repository shows it. Wording like "as far as I know", "if so", "might", "please confirm" means it is a guess: drop it.
+          - It is about the current diff, not an earlier commit of this PR.
+          - It is not a matter of taste and asks for nothing beyond CLAUDE.md (extra waits, checks or abstractions).
+          Drop every finding that fails any of these. A few correct findings are better than many doubtful ones.
 
           Output: only concrete findings, each as an inline comment on the exact line. No PR summary, no praise.
           If there are no findings, post one short comment saying so. Do not modify any files.
