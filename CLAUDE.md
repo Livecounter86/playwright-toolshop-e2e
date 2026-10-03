@@ -96,7 +96,7 @@ export class LoginPage extends BasePage {
 - Web-first assertions only (`toBeVisible`, `toHaveText`, `toHaveURL`, ...).
   No `waitForTimeout`, no reading a value and then comparing it.
 - `locator.count()` and `locator.all()` don't wait. Assert that the first element is visible before using them.
-- Call a locator where it is used: `homePage.locators.productName()`. Don't store it in a local constant.
+- Call a locator where it is used: `homePage.locators.productCards()`. Don't store it in a local constant.
   A constant is a last resort, only when the call cannot be repeated. If it can be written inline, write it inline.
 - Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.
 - Browser contexts are created and closed per test by Playwright. Close only contexts you create yourself
