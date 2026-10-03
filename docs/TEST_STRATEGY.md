@@ -45,7 +45,7 @@ Critical, easy.
 ### Phase 2. Catalog and search
 Critical, easy, read-only, no login.
 - [x] (+) Home page shows a product grid; each card has a name and a `$0.00`-formatted price
-- [ ] (+) Search by name returns only matching products
+- [x] (+) Search by name returns only matching products
 - [ ] (−) Search with no matches shows a "no results" message
 - [ ] (+) Category filter returns products of that category
 - [ ] (+) Brand filter returns products of that brand
