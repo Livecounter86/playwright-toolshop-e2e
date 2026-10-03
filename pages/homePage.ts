@@ -9,6 +9,8 @@ export class HomePage extends BasePage {
       productCardByName: (name: string) => this.page.getByRole('link').filter({
         has: this.page.getByTestId('product-name').getByText(name, { exact: true }),
       }),
+      productCo2Rating: () => this.locators.productCards().getByTestId('co2-rating-badge').locator('.active'),
+      sortSelect: () => this.page.getByTestId('sort'),
     };
   }
 
