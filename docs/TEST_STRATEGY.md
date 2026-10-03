@@ -51,7 +51,7 @@ Critical, easy, read-only, no login.
 - [x] (+) Brand filter returns products of that brand
 - [ ] (+) Sorting by name and price, data-driven over all sort options
 - [ ] (+) Pagination: page 2 shows different products
-- [ ] (−) A price range with no products gives an empty result
+- [x] (−) A price range with no products gives an empty result
 
 ### Phase 3. Product page
 Critical, easy.

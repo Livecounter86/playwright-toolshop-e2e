@@ -28,4 +28,17 @@ test.describe('Catalog filters', () => {
       await expect(names, 'Filtered grid should be shown again').toHaveText(brandNames);
     }
   });
+
+  test('price range without products shows no products', async ({ homePage }) => {
+    await homePage.navigate();
+    await expect(homePage.locators.productCards().first(), 'Product grid should show at least one product').toBeVisible();
+
+    // Home moves the upper handle to the start of the scale, so the range becomes $0-$1, which no product fits.
+    // One key press means one request: several quick presses can return answers out of order
+    // and the grid then shows the result of an intermediate range.
+    await homePage.locators.priceMaxSlider().press('Home');
+
+    await expect(homePage.locators.noResultsMessage(), 'Message about missing products should be shown').toHaveText('There are no products found.');
+    await expect(homePage.locators.productCards(), 'No product cards should be shown').toHaveCount(0);
+  });
 });

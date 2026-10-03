@@ -10,6 +10,8 @@ export class HomePage extends BasePage {
         has: this.page.getByTestId('product-name').getByText(name, { exact: true }),
       }),
       brandCheckbox: (brand: string) => this.page.getByRole('checkbox', { name: brand }),
+      priceMaxSlider: () => this.page.getByRole('slider', { name: 'ngx-slider-max', exact: true }),
+      noResultsMessage: () => this.page.getByTestId('no-results'),
     };
   }
 
