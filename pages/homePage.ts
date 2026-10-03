@@ -9,6 +9,7 @@ export class HomePage extends BasePage {
       productCardByName: (name: string) => this.page.getByRole('link').filter({
         has: this.page.getByTestId('product-name').getByText(name, { exact: true }),
       }),
+      brandCheckbox: (brand: string) => this.page.getByRole('checkbox', { name: brand }),
     };
   }
 

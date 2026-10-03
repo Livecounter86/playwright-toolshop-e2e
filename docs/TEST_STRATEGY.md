@@ -48,7 +48,7 @@ Critical, easy, read-only, no login.
 - [ ] (+) Search by name returns only matching products
 - [ ] (−) Search with no matches shows a "no results" message
 - [ ] (+) Category filter returns products of that category
-- [ ] (+) Brand filter returns products of that brand
+- [x] (+) Brand filter returns products of that brand
 - [ ] (+) Sorting by name and price, data-driven over all sort options
 - [ ] (+) Pagination: page 2 shows different products
 - [ ] (−) A price range with no products gives an empty result
