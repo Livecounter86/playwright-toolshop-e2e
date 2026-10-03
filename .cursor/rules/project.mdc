@@ -101,6 +101,9 @@ export class LoginPage extends BasePage {
 - Web-first assertions only (`toBeVisible`, `toHaveText`, `toHaveURL`, ...).
   No `waitForTimeout`, no reading a value and then comparing it.
 - `locator.count()` and `locator.all()` don't wait. Assert that the first element is visible before using them.
+- Don't complicate a test. To wait until elements have loaded, wait for their request with
+  `waitForResponse('**/products')`, started before the action that sends it. Don't inspect that response:
+  don't read its body, check its fields, or compare the page to what it returned.
 - Call a locator where it is used: `homePage.locators.productCards()`. Don't store it in a local constant.
   A constant is a last resort, only when the call cannot be repeated. If it can be written inline, write it inline.
 - Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.
