@@ -5,11 +5,19 @@ test.describe('Product grid', () => {
     await homePage.navigate();
 
     const cards = homePage.locators.productCards();
-    await expect(cards.first(), 'Product grid should show at least one product').toBeVisible();
+    const names = homePage.locators.productName();
+    const prices = homePage.locators.productPrice();
 
-    for (const card of await cards.all()) {
-      await expect(card.getByTestId('product-name'), 'Product card should show a name').not.toBeEmpty();
-      await expect(card.getByTestId('product-price'), 'Product price should be formatted as $0.00').toHaveText(/^\$\d+\.\d{2}$/);
+    await expect(cards.first(), 'Product grid should show at least one product').toBeVisible();
+    const cardCount = await cards.count();
+    await expect(names, 'Each product card should show a name').toHaveCount(cardCount);
+    await expect(prices, 'Each product card should show a price').toHaveCount(cardCount);
+
+    for (const name of await names.all()) {
+      await expect(name, 'Product card should show a name').not.toBeEmpty();
+    }
+    for (const price of await prices.all()) {
+      await expect(price, 'Product price should be formatted as $0.00').toHaveText(/^\$\d+\.\d{2}$/);
     }
   });
 });
