@@ -7,6 +7,7 @@ export class HomePage extends BasePage {
       searchFieldInput: () => this.page.getByTestId('search-query'),
       productName: () => this.locators.productCards().getByTestId('product-name'),
       buttonSearch: () => this.page.getByTestId('search-submit'),
+      searchCompleted: () => this.page.getByTestId('search_completed'),
     };
   }
 

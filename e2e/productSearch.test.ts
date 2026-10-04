@@ -16,10 +16,8 @@ test.describe('Product search', () => {
     test.info().annotations.push({ type: 'Search query', description: productName });
 
     await homePage.locators.searchFieldInput().fill(productName);
-    await Promise.all([
-      homePage.page.waitForResponse('**/products/search'),
-      homePage.locators.buttonSearch().click(),
-    ]);
+    await homePage.locators.buttonSearch().click();
+    await expect(homePage.locators.searchCompleted(), 'Search completed message should be shown').toBeVisible();
     await expect(homePage.locators.productCards().first(), 'Product grid should show at least one product after search').toBeVisible();
 
     for (const name of await homePage.locators.productName().all()) {

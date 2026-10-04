@@ -104,6 +104,10 @@ export class LoginPage extends BasePage {
 - Don't complicate a test. To wait until elements have loaded, wait for their request with
   `waitForResponse('**/products')`, started before the action that sends it. Don't inspect that response:
   don't read its body, check its fields, or compare the page to what it returned.
+- If an action replaces elements that are already on the page (search, filters, sorting, pagination),
+  waiting for the request is not enough: the old elements stay visible until the page re-renders.
+  Before reading the new elements, assert something that is true only after the update:
+  an element that appears only then, or a text or a count that only the new content has.
 - Call a locator where it is used: `homePage.locators.productCards()`. Don't store it in a local constant.
   A constant is a last resort, only when the call cannot be repeated. If it can be written inline, write it inline.
 - Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.

@@ -45,6 +45,8 @@ jobs:
             repository shows it. Wording like "as far as I know", "if so", "might", "please confirm" means it is a guess: drop it.
           - It is about the current diff, not an earlier commit of this PR.
           - It is not a matter of taste and asks for nothing beyond CLAUDE.md (extra waits, checks or abstractions).
+          - If it suggests a fix, the fix works for every input the test can take (random or changing data).
+            If you can't confirm that, describe the problem without a fix.
           Drop every finding that fails any of these. A few correct findings are better than many doubtful ones.
 
           Output: only concrete findings, each as an inline comment on the exact line. No PR summary, no praise.
