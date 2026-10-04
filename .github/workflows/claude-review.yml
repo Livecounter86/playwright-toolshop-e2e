@@ -1,5 +1,5 @@
 name: Claude Review
-# Reviews a new pull request against the rules in CLAUDE.md. Only comments, commits nothing.
+# Reviews a pull request against the rules in CLAUDE.md and .claude/rules/. Only comments, commits nothing.
 on:
   pull_request:
     types: [opened, ready_for_review, synchronize]
@@ -26,25 +26,21 @@ jobs:
           REPO: ${{ github.repository }}
           PR NUMBER: ${{ github.event.pull_request.number }}
 
-          Review this pull request. First read CLAUDE.md and docs/TEST_STRATEGY.md, then the diff (gh pr diff).
+          Review this pull request. First read CLAUDE.md, the files in .claude/rules/ and docs/TEST_STRATEGY.md, then the diff (gh pr diff).
           Check only the changed code.
           This PR may already have review comments from earlier runs. Do not repeat a finding that was already commented, answered or fixed.
 
-          1. Rules from CLAUDE.md: locators live in `get locators()`; locator names (`button...`, `...Input`);
-             no `expect` in Page Objects; tests import `test` and `expect` from `../fixtures/pages`;
-             every `expect` has a message; web-first assertions only, no `waitForTimeout`;
-             `count()` and `all()` only after waiting for the first element; navigation by clicks, `goto` only for `/`;
-             no credentials in code; a new Page Object is registered in `fixtures/pages.ts`.
+          1. Every rule in CLAUDE.md and .claude/rules/ that applies to the changed code.
           2. Does the test check what its title and its item in docs/TEST_STRATEGY.md claim?
              Is that item checked off (`- [x]`) in this PR?
           3. Stability: dependence on data that other people change, reading elements before the page has updated.
 
           Before posting, check every finding. Post it only if all of these are true:
-          - It names a rule in CLAUDE.md that the changed line breaks, or a real defect you can show from the code.
+          - It names a rule in CLAUDE.md or .claude/rules/ that the changed line breaks, or a real defect you can show from the code.
           - It is verified, not assumed. Don't state how the app, the API or a library behaves unless the code in this
             repository shows it. Wording like "as far as I know", "if so", "might", "please confirm" means it is a guess: drop it.
           - It is about the current diff, not an earlier commit of this PR.
-          - It is not a matter of taste and asks for nothing beyond CLAUDE.md (extra waits, checks or abstractions).
+          - It is not a matter of taste and asks for nothing beyond CLAUDE.md and .claude/rules/ (extra waits, checks or abstractions).
           - If it suggests a fix, the fix works for every input the test can take (random or changing data).
             If you can't confirm that, describe the problem without a fix.
           Drop every finding that fails any of these. A few correct findings are better than many doubtful ones.

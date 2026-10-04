@@ -7,6 +7,7 @@ alwaysApply: true
 
 Guidance for AI assistants working in this repository.
 Keep in sync with `CLAUDE.md` (same rules for Claude Code).
+Docker and CI rules are in `.claude/rules/infra.md` (Cursor: `.cursor/rules/infra.mdc`); they load when you work with Docker or CI files.
 
 ## Project
 
@@ -43,28 +44,29 @@ helpers/users.ts      test accounts read from environment variables
 fixtures/pages.ts     custom fixtures that give tests the Page Objects; exports test and expect
 playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects; loads .env
 .env.example          names of the required environment variables, without values
-docker-compose.yml    local Toolshop from prebuilt images (see Local Toolshop in Docker)
+docker-compose.yml    local Toolshop from prebuilt images
 docker/nginx.conf     nginx config for the `web` service of docker-compose.yml
-.github/workflows/    CI against Toolshop in Docker (see CI)
+.github/workflows/    CI against Toolshop in Docker and Claude review of pull requests
+.claude/rules/        rules that load only for matching files (infra.md: Docker and CI)
 ```
 
 ## Page Objects
 
-Every Page Object extends `BasePage` and has the same shape:
+Every Page Object extends `BasePage` and has the same shape (an illustration; the real locators are in `pages/`):
 
 ```ts
 import { BasePage } from './basePage';
 
-export class LoginPage extends BasePage {
+export class HomePage extends BasePage {
   get locators() {
     return {
-      emailInput: () => this.page.getByTestId('email'),
-      productCardByName: (name: string) => this.page.getByTestId('product-name').filter({ hasText: name }),
+      searchFieldInput: () => this.page.getByTestId('search-query'),
+      productNamesContaining: (text: string) => this.page.getByTestId('product-name').filter({ hasText: text }),
     };
   }
 
-  async userLogin(email: string, password: string) {
-    await this.locators.emailInput().fill(email);
+  async searchFor(query: string) {
+    await this.locators.searchFieldInput().fill(query);
     // ...
   }
 }
@@ -72,9 +74,12 @@ export class LoginPage extends BasePage {
 
 - Pages don't declare `page` or a constructor: both come from `BasePage`, which also creates `this.header`.
 - Locators live in the `locators` getter as arrow functions, static and parameterized ones together.
-  No `readonly` Locator fields. Call them with parentheses: `loginPage.locators.emailInput()`.
-- Locator names: buttons and links start with `button` (`buttonSignIn`, `buttonFavorites`),
-  inputs end with `Input` (`emailInput`).
+  No `readonly` Locator fields. Call them with parentheses: `homePage.locators.searchFieldInput()`.
+- Locator names:
+  - buttons and links start with `button` (`buttonSignIn`, `buttonFavorites`);
+  - inputs end with `Input` (`emailInput`);
+  - other elements are named by what they are, in the plural when the locator matches many
+    (`pageTitle`, `loginErrorMessage`, `tableRows`, `productCards`).
 - Methods are user actions (`navigate`, `userLogin`, ...). They are `async` and `await` every Playwright call.
   Add a method once an action is needed in a second place; until then keep the steps in the test.
 - No `expect` inside Page Objects: pages describe what can be done, tests decide what to check.
@@ -99,23 +104,30 @@ export class LoginPage extends BasePage {
 - Shared setup steps go into `test.beforeEach` inside `test.describe`.
 - Every assertion has a message: `expect(locator, 'Login error should be shown')`.
 - Web-first assertions only (`toBeVisible`, `toHaveText`, `toHaveURL`, ...).
-  No `waitForTimeout`, no reading a value and then comparing it.
-- `locator.count()` and `locator.all()` don't wait. Assert that the first element is visible before using them.
-- Don't complicate a test. To wait until elements have loaded, wait for their request with
-  `waitForResponse('**/products')`, started before the action that sends it. Don't inspect that response:
-  don't read its body, check its fields, or compare the page to what it returned.
-- If an action replaces elements that are already on the page (search, filters, sorting, pagination),
-  waiting for the request is not enough: the old elements stay visible until the page re-renders.
-  Before reading the new elements, assert something that is true only after the update:
-  an element that appears only then, or a text or a count that only the new content has.
+  No `waitForTimeout`. Don't read a value just to check it with a plain `expect(value)`: it doesn't retry.
+  Reading a value to use as test input is fine, e.g. a product name to search for.
+- Wait for loaded content before reading it. Two cases:
+  - First load, none of these elements is on the page yet: start `waitForResponse('**/<path>')` before the action
+    that sends the request, then assert that the first element is visible. Take the path from DevTools → Network
+    and match only the path, so the pattern works both locally and on the public site.
+  - The action replaces elements that are already on the page (search, filters, sorting, pagination):
+    the response is not enough, the old elements stay visible until the page re-renders.
+    Assert something that is true only after the update: an element that appears only then,
+    or a text or a count that only the new content has.
+
+  Only after that use `locator.count()` or `locator.all()`: they don't wait.
+  Wait for a response, don't inspect it: don't read its body, check its fields, or compare the page to it.
+- If a test picks data at random, record the choice: `test.info().annotations.push({ type: 'Search query', description: productName })`.
+  Without it a failure can't be reproduced.
 - Call a locator where it is used: `homePage.locators.productCards()`. Don't store it in a local constant.
   A constant is a last resort, only when the call cannot be repeated. If it can be written inline, write it inline.
 - Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.
 - Browser contexts are created and closed per test by Playwright. Close only contexts you create yourself
   with `browser.newContext()`, in the teardown part of a fixture.
 - Navigate by clicks, as a user does: through the header, the user menu, account tiles, product cards, links.
-  Tests of account pages (favorites, profile, invoices, messages) always reach the page this way,
-  so navigation is covered by real page tests. Use `goto` only for the entry point (`/`) and in setup.
+  Every page a test checks is reached this way, so navigation is covered by real page tests.
+  Use `goto` only for the entry point (`/`) and in setup. The exception is access-control tests
+  (a guest or a customer opens a protected URL): opening the URL directly is what they test.
   If a `goto` shortcut looks tempting (the click path is long or flaky), don't apply it:
   suggest it to the owner, and only after the test is written.
 
@@ -144,58 +156,28 @@ export class LoginPage extends BasePage {
 `actionTimeout` is 10 s (config), `expect` 5 s and the test 30 s (defaults).
 Don't add visibility assertions before actions just to fail faster; `actionTimeout` already covers that.
 
+## Environments
+
+- Locally the suite runs against the public site by default; CI runs it against Toolshop in Docker,
+  never against the public site. `BASE_URL` and `API_URL` choose the app (see `.claude/rules/infra.md`).
+- Tests must pass in both. Planned exception: admin tests that change data run only in Docker (`docs/TEST_STRATEGY.md`).
+- Expected differences in Docker: no "Sign in with Google" button, an empty "Sales over the years" chart
+  on the admin dashboard, and the same data after every seed.
+
 ## Test data on a shared public site
 
 - Tests use two demo accounts: customer (Jack Howe) and admin (John Doe).
   Take their credentials from `users` in `helpers/users.ts`; never write emails or passwords of real accounts in code.
 - `users` reads `CUSTOMER_EMAIL`, `CUSTOMER_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` from the environment
   and throws `Missing env variable ...` if one is empty. Locally they come from `.env` (git-ignored),
-  in CI from GitHub (see CI). The demo credentials are listed in the Toolshop README.
+  in CI from GitHub Secrets and Variables (see `.claude/rules/infra.md`). The demo credentials are listed in the Toolshop README.
+- A new account variable must be added to `.env.example`, `helpers/users.ts`, GitHub settings
+  and the `env:` block of the test step in `.github/workflows/playwright.yml`.
 - Never submit a wrong password for a real demo account: repeated failures lock it for everyone.
   Negative login tests use a non-existent email, e.g. `not.registered@example.com`.
-- Orders and invoices are created by everyone who practises on the site.
-  Assert formats (`/^INV-\d+$/`), not specific values.
-
-## Local Toolshop in Docker
-
-`docker-compose.yml` runs Toolshop locally: UI on http://localhost:4200, API on http://localhost:8091.
-
-```bash
-docker compose up -d                                                    # start; the UI compiles for a few minutes
-docker compose exec -T laravel-api php artisan migrate:fresh --seed     # create and fill the database, also a full reset
-docker compose down                                                     # stop and remove the containers
-BASE_URL=http://localhost:4200 API_URL=http://localhost:8091 npx playwright test   # run the suite against it
-```
-
-- `BASE_URL` (UI) and `API_URL` (used by `loginViaApi`) choose the app under test. Empty or missing means
-  the public site. Values set in the shell win over `.env`, because dotenv doesn't override existing variables.
-- The database is empty after `up`: run the seed command once MariaDB is up. The seed creates the same demo accounts.
-- The `web` service is plain `nginx` with `docker/nginx.conf`: the Toolshop `web` image exists only for arm64,
-  the `api` and `ui` images only for amd64 (`platform: linux/amd64`, emulated on Apple Silicon).
-
-Differences from the public site, all expected:
-- No "Sign in with Google" button: the UI runs `ng serve` (development build), and the button is shown
-  only when `environment.production` is true. Social login is out of scope anyway.
-- The "Sales over the years" chart on the admin dashboard is empty. The report counts only `COMPLETED` invoices;
-  the seed creates all invoices as `AWAITING_FULFILLMENT`, and on the public site a cron job (`order:update`,
-  every 10 minutes) moves them on. The `cron` service is left out on purpose: data must not change on a timer,
-  otherwise the dashboard's "awaiting fulfillment" table empties out mid-run. A test that needs completed orders
-  runs `php artisan order:update` in its own setup.
-- Data is the same after every seed: nobody else creates orders or invoices.
-
-## CI
-
-`.github/workflows/playwright.yml` runs on every pull request, on push to `main` and manually.
-It starts Toolshop from `docker-compose.yml` on the runner, seeds the database, waits for the API (`/status`)
-and the UI, then runs the suite with `BASE_URL=http://localhost:4200` and `API_URL=http://localhost:8091`.
-On failure it prints the container logs. Merge a pull request only when CI is green.
-
-CI never runs against the public site: it shows a Cloudflare bot check to GitHub-hosted runners.
-Do not try to bypass it.
-
-Credentials reach the tests through the `env:` block of the test step: passwords are repository Secrets
-(`secrets.CUSTOMER_PASSWORD`, `secrets.ADMIN_PASSWORD`), emails are repository Variables (`vars.CUSTOMER_EMAIL`,
-`vars.ADMIN_EMAIL`). A new variable must be added to `.env.example`, `helpers/users.ts`, GitHub settings and `env:`.
+- Any data on the public site can change: everyone who practises there creates orders, invoices and messages,
+  and the admin credentials are public, so products, prices, brands and categories can change too.
+  Assert formats (`/^INV-\d+$/`) and relations (every result contains the search query), not specific values.
 
 ## Code style
 
@@ -204,9 +186,11 @@ Type-aware rules `no-floating-promises` and `await-thenable` catch a missing `aw
 
 ## Working in this repo
 
-The owner writes the tests and uses AI assistants for review and explanations.
+Tests are written by the owner and by AI agents (Claude Code, Cursor); the same rules apply to everyone.
+AI assistants also review pull requests and explain the code.
 Unfinished tests in the working tree are work in progress: keep them, don't rewrite or delete them unless asked.
 Re-read a file right before editing it; it may have changed since you last saw it.
+Merge a pull request only when CI is green.
 
 When a diff adds or changes a test (including when you only review it), check the matching item in
 `docs/TEST_STRATEGY.md` (`- [ ]` to `- [x]`) in the same change. Match by what the test asserts, not by file name.
