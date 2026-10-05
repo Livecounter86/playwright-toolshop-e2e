@@ -1,15 +1,18 @@
 import { test as base, type BrowserContext } from '@playwright/test';
-import { loginViaApi } from '../helpers/auth';
-import { users } from '../helpers/users';
 import { HomePage } from '../pages/homePage';
 import { LoginPage } from '../pages/loginPage';
 import { AccountPage } from '../pages/accountPage';
 import { AdminDashboardPage } from '../pages/adminDashboardPage';
-import { ContactPage } from '../pages/contactPage';
+import { authStorageState } from '../helpers/auth';
+import { users } from '../helpers/users';
 
 type AdminSession = {
   homePage: HomePage;
   adminDashboardPage: AdminDashboardPage;
+};
+
+type Options = {
+  authUser: 'admin' | 'customer' | undefined;
 };
 
 type Pages = {
@@ -17,11 +20,11 @@ type Pages = {
   loginPage: LoginPage;
   accountPage: AccountPage;
   adminDashboardPage: AdminDashboardPage;
-  contactPage: ContactPage;
   signInAsAdmin: () => Promise<AdminSession>;
 };
 
-export const test = base.extend<Pages>({
+export const test = base.extend<Pages & Options>({
+  authUser: [undefined, { option: true }],
   homePage: async ({ page }, use) => {
     await use(new HomePage(page));
   },
@@ -34,20 +37,28 @@ export const test = base.extend<Pages>({
   adminDashboardPage: async ({ page }, use) => {
     await use(new AdminDashboardPage(page));
   },
-  contactPage: async ({ page }, use) => {
-    await use(new ContactPage(page));
-  },
-  signInAsAdmin: async ({ browser }, use) => {
+  signInAsAdmin: async ({ browser, baseURL, request }, use) => {
     let context: BrowserContext | undefined;
     await use(async () => {
-      context = await browser.newContext();
+      context = await browser.newContext({
+        storageState: await authStorageState(request, baseURL!, users.admin),
+      });
       const page = await context.newPage();
-      await loginViaApi(page, context.request, users.admin.email, users.admin.password);
-      return { homePage: new HomePage(page), adminDashboardPage: new AdminDashboardPage(page) };
+      await page.goto('/');
+      return {
+        homePage: new HomePage(page),
+        adminDashboardPage: new AdminDashboardPage(page),
+      };
     });
     await context?.close();
   },
-
+  storageState: async ({ authUser, request, baseURL, storageState }, use) => {
+    if (!authUser) {
+      await use(storageState);
+      return;
+    }
+    await use(await authStorageState(request, baseURL!, users[authUser]));
+  },
 });
 
 export { expect } from '@playwright/test';

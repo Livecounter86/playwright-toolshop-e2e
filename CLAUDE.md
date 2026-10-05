@@ -36,7 +36,7 @@ pages/basePage.ts     base class of every page: holds `page` and the shared `hea
 components/           parts shown on many pages (header), same shape as Page Objects
 helpers/              plain functions that are neither pages nor fixtures (API login)
 helpers/users.ts      test accounts read from environment variables
-fixtures/pages.ts     custom fixtures that give tests the Page Objects; exports test and expect
+fixtures/pages.ts     custom fixtures: Page Objects and the signed-in state (authUser, signInAsAdmin); exports test and expect
 playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects; loads .env
 .env.example          names of the required environment variables, without values
 docker-compose.yml    local Toolshop from prebuilt images
@@ -128,17 +128,17 @@ export class HomePage extends BasePage {
 
 ## Signed-in tests
 
-- The sign-in form is tested by `e2e/signIn.test.ts`. Other tests that need a signed-in user log in via the API:
-  `loginViaApi(page, request, users.customer.email, users.customer.password)` from `helpers/auth.ts`. It opens `/`, puts the token
-  into `localStorage['auth-token']` once and reloads, so the header shows the signed-in user;
-  the test then navigates by clicks wherever it needs.
-- Put the token once. Never re-inject it on every navigation (no `addInitScript` for auth):
+- The sign-in form is tested by `e2e/signIn.test.ts`. Other tests get a signed-in user from the fixtures:
+  they log in through the API (`authStorageState` in `helpers/auth.ts`) and create the browser context
+  with the token already in `localStorage['auth-token']`.
+  - `test.use({ authUser: 'customer' })` (or `'admin'`) in a `test.describe`: the test's `page` is signed in
+    from the first `goto('/')`. Without `authUser` the test runs as a guest.
+  - `signInAsAdmin()` opens a second, separate context with a signed-in admin, for tests with two users.
+    Call it once per test, in the step that needs the admin; the fixture closes the context after the test.
+- The token is put once, when the context is created. Never re-inject it on navigation (no `addInitScript` for auth):
   the app must keep the session itself, and a test must fail if it loses it.
 - API tokens live 5 minutes (`expires_in: 300`). Each test gets its own fresh token;
-  never save one token for the whole run.
-- Sign-out tests use their own token and never share it with other tests.
-- Planned: once many tests need a signed-in user, switch to a `storageState` fixture (`test.use({ authUser })`)
-  built on the same API login, which also removes the extra `goto('/')` and reload.
+  never save a `storageState` to a file for the whole run.
 
 ## Locators
 
