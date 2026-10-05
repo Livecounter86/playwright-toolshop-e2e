@@ -134,15 +134,16 @@ export class HomePage extends BasePage {
 ## Signed-in tests
 
 - The sign-in form is tested by `e2e/signIn.test.ts`. Other tests that need a signed-in user log in via the API:
-  `loginViaApi(page, request, users.customer.email, users.customer.password)` from `helpers/auth.ts`. It opens `/` and puts the token
-  into `localStorage['auth-token']` once; the test then navigates wherever it needs.
+  `loginViaApi(page, request, users.customer.email, users.customer.password)` from `helpers/auth.ts`. It opens `/`, puts the token
+  into `localStorage['auth-token']` once and reloads, so the header shows the signed-in user;
+  the test then navigates by clicks wherever it needs.
 - Put the token once. Never re-inject it on every navigation (no `addInitScript` for auth):
   the app must keep the session itself, and a test must fail if it loses it.
 - API tokens live 5 minutes (`expires_in: 300`). Each test gets its own fresh token;
   never save one token for the whole run.
 - Sign-out tests use their own token and never share it with other tests.
 - Planned: once many tests need a signed-in user, switch to a `storageState` fixture (`test.use({ authUser })`)
-  built on the same API login, which also removes the extra `goto('/')`.
+  built on the same API login, which also removes the extra `goto('/')` and reload.
 
 ## Locators
 

@@ -13,4 +13,7 @@ export async function loginViaApi(page: Page, request: APIRequestContext, email:
   await page.evaluate((token) => {
     localStorage.setItem('auth-token', token);
   }, access_token);
+  // The page was rendered before the token existed, so the header still shows a guest.
+  // Reload once so the app reads the token and shows the signed-in header (user menu).
+  await page.reload();
 }
