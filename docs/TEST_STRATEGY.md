@@ -39,7 +39,7 @@ Critical, easy.
 - [x] (−) Malformed email shows a validation error
 - [x] (−) Guest opening `/account` is redirected to sign in
 - [ ] (−) Customer opening `/admin/dashboard` is denied (role boundary)
-- [ ] Infrastructure: `storageState` fixture that gives each signed-in test a fresh API token
+- [x] Infrastructure: `storageState` fixture that gives each signed-in test a fresh API token
   (tokens live 5 minutes, so one token saved for the whole run would expire mid-run)
 
 ### Phase 2. Catalog and search

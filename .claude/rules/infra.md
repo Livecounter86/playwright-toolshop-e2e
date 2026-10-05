@@ -23,7 +23,7 @@ docker compose down                                                     # stop a
 BASE_URL=http://localhost:4200 API_URL=http://localhost:8091 npx playwright test   # run the suite against it
 ```
 
-- `BASE_URL` (UI) and `API_URL` (used by `loginViaApi`) choose the app under test. Empty or missing means
+- `BASE_URL` (UI) and `API_URL` (used by the API login in `helpers/auth.ts`) choose the app under test. Empty or missing means
   the public site. Values set in the shell win over `.env`, because dotenv doesn't override existing variables.
 - The database is empty after `up`: run the seed command once MariaDB is up. The seed creates the same demo accounts.
 - The `web` service is plain `nginx` with `docker/nginx.conf`: the Toolshop `web` image exists only for arm64,
