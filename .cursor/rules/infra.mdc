@@ -55,6 +55,7 @@ Credentials reach the tests through the `env:` block of the test step: passwords
 Claude reviews pull requests:
 - `.github/workflows/claude-review.yml` reviews a pull request against `CLAUDE.md` and `.claude/rules/` when it is opened,
   marked ready for review or updated; drafts are skipped. It only leaves comments and commits nothing.
+  With no findings it posts nothing: the green check of the job means the review passed.
 - `.github/workflows/claude.yml` answers `@claude` in issue and pull request comments,
   only when the comment is written by the repository owner (`author_association == 'OWNER'`).
 - Both use the Claude subscription token from the `CLAUDE_CODE_OAUTH_TOKEN` repository secret.
