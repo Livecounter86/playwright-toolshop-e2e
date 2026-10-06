@@ -31,7 +31,7 @@ Before committing: lint, type check and tests must pass.
 
 ```
 e2e/                  test specs (*.test.ts)
-pages/                Page Objects, one class per page (camelCase file, PascalCase class)
+pages/                Page Objects, one class per section of the app (camelCase file, PascalCase class)
 pages/basePage.ts     base class of every page: holds `page` and the shared `header`
 components/           parts shown on many pages (header), same shape as Page Objects
 helpers/              plain functions that are neither pages nor fixtures (API login)
@@ -68,6 +68,9 @@ export class HomePage extends BasePage {
 ```
 
 - Pages don't declare `page` or a constructor: both come from `BasePage`, which also creates `this.header`.
+- One class per section of the app, not per URL: a list and the detail pages of its items share one class
+  (`/account/messages` and `/account/messages/<id>` are `AccountMessagesPage`). The admin and customer versions
+  of a section are separate classes (`AdminMessagesPage`). Locator names must stay unambiguous inside the class.
 - Locators live in the `locators` getter as arrow functions, static and parameterized ones together.
   No `readonly` Locator fields. Call them with parentheses: `homePage.locators.searchFieldInput()`.
 - Locator names:
@@ -79,6 +82,7 @@ export class HomePage extends BasePage {
   Add a method once an action is needed in a second place; until then keep the steps in the test.
 - No `expect` inside Page Objects: pages describe what can be done, tests decide what to check.
 - A new Page Object must be registered in `fixtures/pages.ts` (the `Pages` type and a fixture).
+  A page that only the admin opens in a two-user test goes into `AdminSession` and the object `signInAsAdmin()` returns.
 
 ## Components
 
@@ -111,7 +115,8 @@ export class HomePage extends BasePage {
     or a text or a count that only the new content has.
 
   Only after that use `locator.count()` or `locator.all()`: they don't wait.
-  Wait for a response, don't inspect it: don't read its body, check its fields, or compare the page to it.
+  Wait for a response, don't check it: don't assert its status or fields, and don't compare the page to it.
+  Reading a value the server created to use as test input is fine, e.g. the id of a new message.
 - If a test picks data at random, record the choice: `test.info().annotations.push({ type: 'Search query', description: productName })`.
   Without it a failure can't be reproduced.
 - Call a locator where it is used: `homePage.locators.productCards()`. Don't store it in a local constant.
@@ -156,7 +161,8 @@ Don't add visibility assertions before actions just to fail faster; `actionTimeo
 
 - Locally the suite runs against the public site by default; CI runs it against Toolshop in Docker,
   never against the public site. `BASE_URL` and `API_URL` choose the app (see `.claude/rules/infra.md`).
-- Tests must pass in both. Planned exception: admin tests that change data run only in Docker (`docs/TEST_STRATEGY.md`).
+- Tests must pass in both. Exception: admin tests that change data run only in Docker (`docs/TEST_STRATEGY.md`);
+  they skip themselves elsewhere: `test.skip(({ baseURL }) => !baseURL?.startsWith('http://localhost'), '<reason>')`.
 - Expected differences in Docker: no "Sign in with Google" button, an empty "Sales over the years" chart
   on the admin dashboard, and the same data after every seed.
 
