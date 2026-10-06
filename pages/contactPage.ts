@@ -6,7 +6,7 @@ export class ContactPage extends BasePage {
       subjectSelector: () => this.page.getByTestId('subject'),
       messageInput: () => this.page.getByTestId('message'),
       buttonSend: () => this.page.getByTestId('contact-submit'),
-      messageSentConfirmation: () => this.page.getByRole('alert', { name: ' Thanks for your message! We will contact you shortly. ' }),
+      messageSentConfirmation: () => this.page.getByRole('alert').filter({ hasText: ' Thanks for your message! We will contact you shortly. ' }),
     };
   }
 }

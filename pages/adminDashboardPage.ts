@@ -7,7 +7,6 @@ export class AdminDashboardPage extends BasePage {
       invoiceTable: () => this.page.getByRole('table'),
       columnHeaders: () => this.page.getByRole('columnheader'),
       tableRows: () => this.locators.invoiceTable().locator('tbody').getByRole('row'),
-      
     };
   }
 }

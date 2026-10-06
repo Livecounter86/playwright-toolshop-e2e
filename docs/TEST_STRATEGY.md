@@ -115,7 +115,7 @@ Lower priority.
 - [ ] (+) Guest and customer can send a message
 - [ ] (−) Missing subject, too short message, invalid email show validation errors
 - [ ] (−) Attachment of a wrong type or size is rejected
-- [ ] (+) Customer's message appears in Account → Messages
+- [x] (+) Customer's message appears in Account → Messages
 
 ### Phase 9. Admin area
 Harder. Data-changing tests run against Docker only.
@@ -124,7 +124,7 @@ Harder. Data-changing tests run against Docker only.
 - [ ] (−) Empty name or duplicate slug is rejected
 - [ ] (+) A product created by the admin is visible to a customer in the catalog
 - [ ] (+) Admin changes an order status; the customer sees it on the invoice
-- [ ] (+) Admin replies to a message; the customer sees the reply
+- [x] (+) Admin replies to a message; the customer sees the reply
 
 ### Phase 10. Nice to have
 - [ ] Language switch changes menu labels
