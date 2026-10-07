@@ -39,7 +39,7 @@ e2e/                  test specs (*.test.ts)
 pages/                Page Objects, one class per section of the app (camelCase file, PascalCase class)
 pages/basePage.ts     base class of every page: holds `page` and the shared `header`
 components/           parts shown on many pages (header), same shape as Page Objects
-helpers/              plain functions that are neither pages nor fixtures (API login)
+helpers/              plain functions that are neither pages nor fixtures (API login, table cell by column title)
 helpers/users.ts      test accounts read from environment variables
 fixtures/pages.ts     custom fixtures: Page Objects and the signed-in state (authUser, signInAsAdmin); exports test and expect
 playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects; loads .env

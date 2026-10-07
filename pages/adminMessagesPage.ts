@@ -1,9 +1,12 @@
 import { BasePage } from './basePage';
+import { cellInColumn } from '../helpers/table';
 
 export class AdminMessagesPage extends BasePage {
   get locators() {
     return {
-      messageTable: () => this.page.getByRole('table'),
+      tableRows: () => this.page.locator('tbody').getByRole('row'),
+      tableRow: (id: string) => this.locators.tableRows().filter({ has: this.locators.buttonDetails(id) }),
+      tableCell: (id: string, column: string) => cellInColumn(this.locators.tableRow(id), column),
       buttonDetails: (id: string) => this.page.getByTestId(`message-details-${id}`),
       replyInput: () => this.page.getByTestId('message'),
       buttonReply: () => this.page.getByTestId('reply-submit'),

@@ -13,6 +13,7 @@
   "description": "Playwright + TypeScript E2E tests for the Practice Software Testing (Toolshop) demo app",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.63.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^26.6.1",
