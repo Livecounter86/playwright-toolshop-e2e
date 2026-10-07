@@ -112,7 +112,7 @@ Medium priority.
 
 ### Phase 8. Contact form
 Lower priority.
-- [ ] (+) Guest and customer can send a message
+- [x] (+) Guest and customer can send a message
 - [ ] (−) Missing subject, too short message, invalid email show validation errors
 - [ ] (−) Attachment of a wrong type or size is rejected
 - [x] (+) Customer's message appears in Account → Messages
