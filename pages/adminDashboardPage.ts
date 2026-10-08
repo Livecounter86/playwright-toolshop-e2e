@@ -9,4 +9,8 @@ export class AdminDashboardPage extends BasePage {
       tableRows: () => this.locators.invoiceTable().locator('tbody').getByRole('row'),
     };
   }
+
+  async navigate() {
+    await this.page.goto('/admin/dashboard');
+  }
 }
