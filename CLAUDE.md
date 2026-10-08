@@ -39,10 +39,10 @@ helpers/users.ts      test accounts read from environment variables
 fixtures/pages.ts     custom fixtures: Page Objects and the signed-in state (authUser, signInAsAdmin); exports test and expect
 playwright.config.ts  baseURL, testIdAttribute, timeouts, browser projects; loads .env
 .env.example          names of the required environment variables, without values
-docker-compose.yml    local Toolshop from prebuilt images
-docker/nginx.conf     nginx config for the `web` service of docker-compose.yml
+docker-compose.yml    local Toolshop from prebuilt images (docker/nginx.conf: config of its `web` service)
 .github/workflows/    CI against Toolshop in Docker and Claude review of pull requests
 .claude/rules/        rules that load only for matching files (infra.md: Docker and CI)
+.claude/skills/       project skills (writing-e2e-tests: writes and verifies a test for a strategy item)
 ```
 
 ## Page Objects
