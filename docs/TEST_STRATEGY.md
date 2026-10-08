@@ -46,7 +46,7 @@ Critical, easy.
 Critical, easy, read-only, no login.
 - [x] (+) Home page shows a product grid; each card has a name and a `$0.00`-formatted price
 - [x] (+) Search by name returns only matching products
-- [ ] (−) Search with no matches shows a "no results" message
+- [x] (−) Search with no matches shows a "no results" message
 - [ ] (+) Category filter returns products of that category
 - [ ] (+) Brand filter returns products of that brand
 - [ ] (+) Sorting by name and price, data-driven over all sort options

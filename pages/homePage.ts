@@ -8,10 +8,16 @@ export class HomePage extends BasePage {
       productName: () => this.locators.productCards().getByTestId('product-name'),
       buttonSearch: () => this.page.getByTestId('search-submit'),
       searchCompleted: () => this.page.getByTestId('search_completed'),
+      noResultsMessage: () => this.page.getByTestId('no-results'),
     };
   }
 
   async navigate() {
     await this.page.goto('/');
+  }
+
+  async searchFor(query: string) {
+    await this.locators.searchFieldInput().fill(query);
+    await this.locators.buttonSearch().click();
   }
 }
