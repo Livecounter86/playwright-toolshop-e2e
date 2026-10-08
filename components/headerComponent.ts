@@ -15,6 +15,7 @@ export class HeaderComponent {
       userMenu: () => this.page.getByTestId('nav-menu'),
       buttonContact: () => this.page.getByTestId('nav-contact'),
       buttonSignOut: () => this.page.getByTestId('nav-sign-out'),
+      buttonMyAccount: () => this.page.getByTestId('nav-my-account'),
       buttonMessages: () => this.page.getByTestId('nav-admin-messages'),
       buttonMyMessages: () => this.page.getByTestId('nav-my-messages'),
     };
