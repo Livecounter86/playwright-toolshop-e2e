@@ -17,7 +17,10 @@ export class HeaderComponent {
       buttonSignOut: () => this.page.getByTestId('nav-sign-out'),
       buttonMyAccount: () => this.page.getByTestId('nav-my-account'),
       buttonMessages: () => this.page.getByTestId('nav-admin-messages'),
+      buttonOrders: () => this.page.getByTestId('nav-admin-orders'),
       buttonMyMessages: () => this.page.getByTestId('nav-my-messages'),
+      buttonCart: () => this.page.getByTestId('nav-cart'),
+      cartQuantity: () => this.page.getByTestId('cart-quantity'),
     };
   }
 }
