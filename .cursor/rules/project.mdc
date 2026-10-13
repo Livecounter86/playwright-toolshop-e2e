@@ -61,7 +61,7 @@ export class HomePage extends BasePage {
   get locators() {
     return {
       searchFieldInput: () => this.page.getByTestId('search-query'),
-      productNamesContaining: (text: string) => this.page.getByTestId('product-name').filter({ hasText: text }),
+      productNameHeading: (name: string) => this.page.getByRole('heading', { name, exact: true }),
     };
   }
 
@@ -124,6 +124,12 @@ export class HomePage extends BasePage {
   Reading a value the server created to use as test input is fine, e.g. the id of a new message.
 - If a test picks data at random, record the choice: `test.info().annotations.push({ type: 'Search query', description: productName })`.
   Without it a failure can't be reproduced.
+- Page Objects say how to find an element; tests say which elements they need.
+  A Page Object locator finds an element by what it is: its `data-test`, its role and name,
+  or a value that tells one of many apart (`tableRow(id)`, `replyText(text)`).
+  Picking elements by a condition the test needs (in stock, without a reply, with a status) is written in the test:
+  combine Page Object locators with `filter()` and `locator()`, don't add a locator for each condition.
+  `homePage.locators.productCards().filter({ hasNot: homePage.locators.outOfStockLabels() }).locator(homePage.locators.productName())`
 - Call a locator where it is used: `homePage.locators.productCards()`. Don't store it in a local constant.
   A constant is a last resort, only when the call cannot be repeated. If it can be written inline, write it inline.
 - Page-level checks go on the page: `expect(page).toHaveURL('/admin/dashboard')`. Paths are relative to `baseURL`.

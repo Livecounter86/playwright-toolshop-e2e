@@ -83,7 +83,7 @@ Critical, medium effort.
 
 ### Phase 6. Checkout and payment
 Most critical, harder.
-- [ ] (+) Signed-in customer pays with Cash on Delivery and gets an `INV-…` invoice number
+- [x] (+) Signed-in customer pays with Cash on Delivery and gets an `INV-…` invoice number
 - [ ] (+) Other payment methods, data-driven: Bank Transfer, Credit Card, Buy Now Pay Later, Gift Card
 - [ ] (−) Credit card: invalid number, expired date, empty CVV show validation errors
 - [ ] (−) Empty required billing address fields block the next step

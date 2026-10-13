@@ -72,6 +72,7 @@ Take the first option that exists:
 
 - **One of many** (a row, a card, a reply): find the container by something only it has, then search inside it:
   ``tableRows().filter({ has: getByTestId(`message-details-${id}`) })``, `filter({ hasText: uniqueText })`.
+  This belongs in the Page Object. A filter by a condition the test needs (in stock, with a status) goes in the test.
 - **A table cell:** `cellInColumn(row, 'Status')` from `helpers/table.ts`. The column position comes from the header.
 - **A `data-test` with an id in it:** a parameterized locator, or a regex of its format (`productCards` in `pages/homePage.ts`).
 - **Look-alike blocks without `data-test`:** tell them apart by meaningful content and comment it

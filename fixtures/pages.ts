@@ -7,12 +7,16 @@ import { authStorageState } from '../helpers/auth';
 import { users } from '../helpers/users';
 import { ContactPage } from '../pages/contactPage';
 import { AdminMessagesPage } from '../pages/adminMessagesPage';
+import { AdminOrdersPage } from '../pages/adminOrdersPage';
 import { AccountMessagesPage } from '../pages/accountMessagesPage';
+import { ProductPage } from '../pages/productPage';
+import { CheckoutPage } from '../pages/checkoutPage';
 
 type AdminSession = {
   homePage: HomePage;
   adminDashboardPage: AdminDashboardPage;
   adminMessagesPage: AdminMessagesPage;
+  adminOrdersPage: AdminOrdersPage;
 };
 
 type Options = {
@@ -27,6 +31,8 @@ type Pages = {
   contactPage: ContactPage;
   signInAsAdmin: () => Promise<AdminSession>;
   accountMessagesPage: AccountMessagesPage;
+  productPage: ProductPage;
+  checkoutPage: CheckoutPage;
 };
 
 export const test = base.extend<Pages & Options>({
@@ -49,6 +55,12 @@ export const test = base.extend<Pages & Options>({
   accountMessagesPage: async ({ page }, use) => {
     await use(new AccountMessagesPage(page));
   },
+  productPage: async ({ page }, use) => {
+    await use(new ProductPage(page));
+  },
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  },
   signInAsAdmin: async ({ browser, baseURL, request }, use) => {
     let context: BrowserContext | undefined;
     await use(async () => {
@@ -61,6 +73,7 @@ export const test = base.extend<Pages & Options>({
         homePage: new HomePage(page),
         adminDashboardPage: new AdminDashboardPage(page),
         adminMessagesPage: new AdminMessagesPage(page),
+        adminOrdersPage: new AdminOrdersPage(page),
       };
     });
     await context?.close();
